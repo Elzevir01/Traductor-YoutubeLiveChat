@@ -11,6 +11,7 @@ import java.awt.BorderLayout;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JButton;
 import javax.swing.BoxLayout;
@@ -20,6 +21,10 @@ import javax.swing.JTextPane;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -37,36 +42,60 @@ public class YtFrame extends JFrame {
 	YoutubeChat ytc = new YoutubeChat();
 	public Thread ytcT= null;
 	Aws aws = new Aws();
+	UiIdioma uii = new UiIdioma();
 	Thread awsT =null;
 	private ButtonGroup bg = new ButtonGroup();
 	public static DefaultListModel modeloLista = new DefaultListModel();
 	public static JTextPane txtpnTxptraduccion;
-	public static JRadioButton rdbTraducirSeleccion;
-	public static JRadioButton rdbTraducirTodo;
-	public static JButton btnIniciar;
-	public static JButton btnDetener;
-	public static JComboBox cmbIdiomaOrigen;
-	public static JComboBox cmbIdiomaSalida;
+	public static JRadioButton rdbTraducirSeleccion, rdbTraducirTodo;
+	public static JButton btnIniciar, btnDetener;
+	public static JComboBox cmbIdiomaOrigen, cmbIdiomaSalida;
 	public static volatile boolean estadoHilo;
+	public boolean autoScroll = false;
+	public static JScrollBar vertical;
+	public static JList listLiveChat;
+	public static JComboBox cmbUIIdioma, cmbServidor;
+	public static JLabel lblUIIdioma ,lblYoutubeLink, lblServidor, lblIdiomaOrigen, lblIdiomaTraduccion ;
 	
-	///////////////////////////getSelectedItem()   //// getSelectedIndex()///
-	String url = "WFkprwV7m4Q";
 	
+	///////////////////////////getSelectedItem()   //// getSelectedIndex()///	
 	public YtFrame() {
-		
 		getContentPane().setLayout(new BorderLayout(0, 0));
 		setMinimumSize(new Dimension(30, 30));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 656, 394);
+		setBounds(100, 100, 739, 394);
 		JPanel panelSuperior = new JPanel();
 		getContentPane().add(panelSuperior, BorderLayout.NORTH);
 		panelSuperior.setLayout(new BorderLayout(0, 0));
 		
+		JPanel panelServidor = new JPanel();
+		panelSuperior.add(panelServidor, BorderLayout.NORTH);
+		
+		lblServidor = new JLabel("Servidor:");
+		panelServidor.add(lblServidor);
+		
+		cmbServidor = new JComboBox();
+		cmbServidor.setModel(new DefaultComboBoxModel(new String[] {"Estados Unidos", "Europa", "Sur America", "Asia"}));
+		panelServidor.add(cmbServidor);
+		
+		lblUIIdioma = new JLabel("UI Idioma");
+		panelServidor.add(lblUIIdioma);
+		
+		cmbUIIdioma = new JComboBox();
+		//////////////////////////////////////////////////////////////////////
+		cmbUIIdioma.addItemListener(new ItemListener() {
+			  public void itemStateChanged(ItemEvent itemEvent) {
+				  uii.seleccionIdioma();
+				  }
+				});
+		cmbUIIdioma.setModel(new DefaultComboBoxModel(new String[] {"Español", "Ingles", "Japones", "Chino"}));
+		panelServidor.add(cmbUIIdioma);
+		
 		JPanel panelLink = new JPanel();
-		panelSuperior.add(panelLink, BorderLayout.NORTH);
+		panelSuperior.add(panelLink, BorderLayout.CENTER);
 		panelLink.setLayout(new BoxLayout(panelLink, BoxLayout.X_AXIS));
 		
-		JLabel lblYoutubeLink = new JLabel("Youtube Link:");
+		lblYoutubeLink = new JLabel("Youtube Link:");
 		panelLink.add(lblYoutubeLink);
 		
 		txtLink = new JTextField();
@@ -76,17 +105,17 @@ public class YtFrame extends JFrame {
 		//txtLink.setText(url);
 		
 		JPanel panelOpciones = new JPanel();
-		panelSuperior.add(panelOpciones);
+		panelSuperior.add(panelOpciones, BorderLayout.SOUTH);
 		panelOpciones.setLayout(new BoxLayout(panelOpciones, BoxLayout.X_AXIS));
 		
 		JPanel panelModo = new JPanel();
 		panelOpciones.add(panelModo);
 		
-		rdbTraducirSeleccion = new JRadioButton("Traducir Seleccion");
+		rdbTraducirSeleccion = new JRadioButton("Chat Original");
 		rdbTraducirSeleccion.setSelected(true);
 		panelModo.add(rdbTraducirSeleccion);
 		
-		rdbTraducirTodo = new JRadioButton("Traducir Todo");
+		rdbTraducirTodo = new JRadioButton("Chat Traducido(lento)");
 		panelModo.add(rdbTraducirTodo);
 		
 		bg.add(rdbTraducirSeleccion);
@@ -96,15 +125,15 @@ public class YtFrame extends JFrame {
 		panelOpciones.add(panelIdioma);
 		panelIdioma.setLayout(new BoxLayout(panelIdioma, BoxLayout.X_AXIS));
 		
-		JLabel lblIdiomaOrigen = new JLabel("Idioma Origen");
+		lblIdiomaOrigen = new JLabel("Idioma Origen:");
 		panelIdioma.add(lblIdiomaOrigen);
 		
 		cmbIdiomaOrigen = new JComboBox();
-		cmbIdiomaOrigen.setModel(new DefaultComboBoxModel(new String[] {"Ingles", "Japones", "Español"}));
+		cmbIdiomaOrigen.setModel(new DefaultComboBoxModel(new String[] {"Auto"}));
 		panelIdioma.add(cmbIdiomaOrigen);
 		
-		JLabel lblNewLabel = new JLabel("Idioma Salida");
-		panelIdioma.add(lblNewLabel);
+		lblIdiomaTraduccion = new JLabel("Idioma Traduccion:");
+		panelIdioma.add(lblIdiomaTraduccion);
 		
 		cmbIdiomaSalida = new JComboBox();
 		cmbIdiomaSalida.setModel(new DefaultComboBoxModel(new String[] {"Español", "Ingles", "Japones", "Chino"}));
@@ -142,14 +171,27 @@ public class YtFrame extends JFrame {
 		panelCentral.add(panelChat);
 		panelChat.setLayout(new CardLayout(0, 0));
 		
-		JList listLiveChat = new JList();
+		listLiveChat = new JList();
 		panelChat.add(listLiveChat, "name_40278394319370");
 		listLiveChat.setModel(modeloLista);
 		
 		JScrollPane scrollJlistC = new JScrollPane(listLiveChat);
-		panelChat.add(scrollJlistC, "name_38499319947502");
-		//contentPane.add(panelChat, BorderLayout.CENTER);
+		panelChat.add(scrollJlistC, "name_38499319947502");	
+		vertical = scrollJlistC.getVerticalScrollBar();
 		
+
+		scrollJlistC.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {  
+	        public void adjustmentValueChanged(AdjustmentEvent e) {  
+	        	if(autoScroll() ==true) {
+	        	
+	            e.getAdjustable().setValue(e.getAdjustable().getMaximum()); 
+	        	}
+	        	
+	        	
+	        }
+	    });
+		
+		////////////////////////////////////
 		//// METODOS/////
 		
 		/// Click Iniciar ///
@@ -197,6 +239,19 @@ public class YtFrame extends JFrame {
 		btnDetener.setEnabled(!x);
 	}
 	
-
-
+	public boolean autoScroll() {
+		int lastIndex = listLiveChat.getModel().getSize() - 1;
+		int index = listLiveChat.getLastVisibleIndex();
+		if ( index == lastIndex-1 | index == lastIndex-2 | index == lastIndex-3 | index == lastIndex-4 | index == -1) {
+			
+			autoScroll = true;
+	    }else {
+	    	autoScroll=false;
+	    }
+		//System.out.println(listLiveChat.getLastVisibleIndex()+" "+lastIndex);
+		return autoScroll;
+	}
+	
 }
+
+

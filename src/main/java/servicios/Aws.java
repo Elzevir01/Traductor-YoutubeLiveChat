@@ -60,6 +60,7 @@ public class Aws implements Runnable{
 	}
 	
 public String traducirTodo(String texto) {
+		idioma();
         try {
        AmazonTranslate translate = AmazonTranslateClient.builder()
                .withCredentials(new AWSStaticCredentialsProvider(awsCreds.getCredentials()))
@@ -69,7 +70,7 @@ public String traducirTodo(String texto) {
        TranslateTextRequest request = new TranslateTextRequest()
                .withText(texto)
                .withSourceLanguageCode("auto")
-               .withTargetLanguageCode("en");
+               .withTargetLanguageCode(idioma);
       
        TranslateTextResult result  = translate.translateText(request);
        texto = result.getTranslatedText();
@@ -81,7 +82,6 @@ public String traducirTodo(String texto) {
        return texto;
 	}
 	public String idioma() {
-		System.out.println(ytf.cmbIdiomaSalida.getSelectedIndex());
 		switch (ytf.cmbIdiomaSalida.getSelectedIndex()) {
 		case 0:
 			idioma = "es";

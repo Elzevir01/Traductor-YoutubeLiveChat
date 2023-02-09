@@ -49,11 +49,12 @@ public class YoutubeChat implements Runnable{
 				
 		while (!ytf.btnIniciar.isEnabled()) {
 		    chat.update();
+		    
 		    for (ChatItem item : chat.getChatItems()) {
-		    	mensaje = item.getMessage();
-		    	//if(item.getMessage() != mensaje)
-		         ytf.modeloLista.addElement(item.getAuthorName()+": "+item.getMessage());
-		        
+		    	if(!ytf.modeloLista.contains(item.getAuthorName()+": "+item.getMessage())) {
+			    	 mensaje = item.getMessage();
+			         ytf.modeloLista.addElement(item.getAuthorName()+": "+item.getMessage());
+		    	}
 		    }
 		    liveStatusCheckCycle++;
 		    if(liveStatusCheckCycle >= 10) {
