@@ -12,7 +12,7 @@ import ytChat.YtFrame;
 
 public class Aws implements Runnable{
 	String texto;
-	String REGION = "us-east-1";////Europa eu-central-1//Sur America sa-east-1////Medio Oriente me-central-1////Asia Pacifico ap-northeast-1////Estados Unidos E us-east-1////
+	String regionServer = "us-east-1";////Europa eu-central-1//Sur America sa-east-1////Medio Oriente me-central-1////Asia Pacifico ap-northeast-1////Estados Unidos E us-east-1////
 	YtFrame ytf;
 	AWSCredentialsProvider awsCreds = DefaultAWSCredentialsProviderChain.getInstance();
 	String idioma;
@@ -41,7 +41,7 @@ public class Aws implements Runnable{
         try {
        AmazonTranslate translate = AmazonTranslateClient.builder()
                .withCredentials(new AWSStaticCredentialsProvider(awsCreds.getCredentials()))
-               .withRegion(REGION)
+               .withRegion(regionServer)
                .build();
 
        TranslateTextRequest request = new TranslateTextRequest()
@@ -64,7 +64,7 @@ public String traducirTodo(String texto) {
         try {
        AmazonTranslate translate = AmazonTranslateClient.builder()
                .withCredentials(new AWSStaticCredentialsProvider(awsCreds.getCredentials()))
-               .withRegion(REGION)
+               .withRegion(regionServer)
                .build();
 
        TranslateTextRequest request = new TranslateTextRequest()
@@ -100,5 +100,33 @@ public String traducirTodo(String texto) {
 			break;
 		}
 		return idioma;
+	}
+	public String servidor() {
+		
+		////seleccion de server "Estados Unidos", "Europa", "Sur America", "Asia"////
+		//Europa eu-central-1//Sur America sa-east-1////Medio Oriente me-central-1////Asia Pacifico ap-northeast-1////Estados Unidos E us-east-1////
+		switch (ytf.cmbServidor.getSelectedIndex()) {
+		case 0:
+			//servidor Norte America Este
+			regionServer = "us-east-1";
+			break;
+		case 1:
+			//servidor Europa Central
+			regionServer = "eu-central-1";
+			break;
+		case 2:
+			//servidor Sur America
+			regionServer = "sa-east-1";
+			break;
+		case 3:
+			//Servidor Asia Pacifico
+			regionServer = "ap-northeast-1";
+			break;
+		default:
+			regionServer = "us-east-1";
+			break;
+		}
+		System.out.println("Server activo: "+regionServer);
+		return regionServer;
 	}
 }

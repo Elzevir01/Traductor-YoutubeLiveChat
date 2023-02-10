@@ -6,6 +6,7 @@ import javax.swing.JPanel;
 
 import servicios.Aws;
 import servicios.YoutubeChat;
+import ytChat.RenderList;
 
 import java.awt.BorderLayout;
 import javax.swing.JLabel;
@@ -36,12 +37,14 @@ import java.awt.Dimension;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 
+
 public class YtFrame extends JFrame {
 	public JPanel contentPane;
 	public JTextField txtLink;
 	YoutubeChat ytc = new YoutubeChat();
 	public Thread ytcT= null;
 	Aws aws = new Aws();
+	public RenderList rl = new RenderList();
 	UiIdioma uii = new UiIdioma();
 	Thread awsT =null;
 	private ButtonGroup bg = new ButtonGroup();
@@ -75,7 +78,7 @@ public class YtFrame extends JFrame {
 		panelServidor.add(lblServidor);
 		
 		cmbServidor = new JComboBox();
-		cmbServidor.setModel(new DefaultComboBoxModel(new String[] {"Estados Unidos", "Europa", "Sur America", "Asia"}));
+		cmbServidor.setModel(new DefaultComboBoxModel(new String[] {"Norte America", "Europa", "Sur America", "Asia"}));
 		panelServidor.add(cmbServidor);
 		
 		lblUIIdioma = new JLabel("UI Idioma");
@@ -102,7 +105,6 @@ public class YtFrame extends JFrame {
 		txtLink.setHorizontalAlignment(SwingConstants.LEFT);
 		panelLink.add(txtLink);
 		txtLink.setColumns(10);
-		//txtLink.setText(url);
 		
 		JPanel panelOpciones = new JPanel();
 		panelSuperior.add(panelOpciones, BorderLayout.SOUTH);
@@ -174,6 +176,7 @@ public class YtFrame extends JFrame {
 		listLiveChat = new JList();
 		panelChat.add(listLiveChat, "name_40278394319370");
 		listLiveChat.setModel(modeloLista);
+		listLiveChat.setCellRenderer(new RenderList());
 		
 		JScrollPane scrollJlistC = new JScrollPane(listLiveChat);
 		panelChat.add(scrollJlistC, "name_38499319947502");	
