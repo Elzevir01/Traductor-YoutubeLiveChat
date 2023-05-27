@@ -20,7 +20,15 @@ public class RenderList implements ListCellRenderer<String>{
 	        } else {
 	        	renderer.setBackground(Color.BLACK);
 	        }
-		renderer.setForeground(Color.WHITE);
+		 String texto = value;
+		 if(texto.contains("[M]"))
+			 renderer.setForeground(Color.green.brighter());
+		 else if(texto.contains("[MOD]")){
+			 renderer.setForeground(Color.blue.brighter());
+		 }else {
+			 renderer.setForeground(Color.WHITE);
+		 }
+		// System.out.println(value);
 		return renderer;
 	}
 	 public static boolean esPar(int numero) {

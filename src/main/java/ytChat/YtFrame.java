@@ -19,6 +19,8 @@ import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.JTextPane;
+import javax.swing.ListModel;
+
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -28,6 +30,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.URL;
 
 import javax.swing.SwingConstants;
 import javax.swing.JList;
@@ -40,15 +43,15 @@ import javax.swing.DefaultComboBoxModel;
 
 public class YtFrame extends JFrame {
 	public JPanel contentPane;
-	public JTextField txtLink;
+	public JTextField txtLink ;
 	YoutubeChat ytc = new YoutubeChat();
 	public Thread ytcT= null;
 	Aws aws = new Aws();
 	public RenderList rl = new RenderList();
 	UiIdioma uii = new UiIdioma();
 	Thread awsT =null;
+	public String[] items;
 	private ButtonGroup bg = new ButtonGroup();
-	public static DefaultListModel modeloLista = new DefaultListModel();
 	public static JTextPane txtpnTxptraduccion;
 	public static JRadioButton rdbTraducirSeleccion, rdbTraducirTodo;
 	public static JButton btnIniciar, btnDetener;
@@ -56,9 +59,14 @@ public class YtFrame extends JFrame {
 	public static volatile boolean estadoHilo;
 	public boolean autoScroll = false;
 	public static JScrollBar vertical;
-	public static JList listLiveChat;
+	
 	public static JComboBox cmbUIIdioma, cmbServidor;
 	public static JLabel lblUIIdioma ,lblYoutubeLink, lblServidor, lblIdiomaOrigen, lblIdiomaTraduccion ;
+	//public static DefaultListModel modeloLista = new DefaultListModel();
+	
+	public static JList<String> listLiveChat;
+	public static DefaultListModel<String> modeloLista = new DefaultListModel<String>();;
+	
 	
 	
 	///////////////////////////getSelectedItem()   //// getSelectedIndex()///	
@@ -103,6 +111,7 @@ public class YtFrame extends JFrame {
 		
 		txtLink = new JTextField();
 		txtLink.setHorizontalAlignment(SwingConstants.LEFT);
+		txtLink.setText("https://www.youtube.com/watch?v=gcHA2v3uanA");/////////////////////////////////////////////////////////////////////
 		panelLink.add(txtLink);
 		txtLink.setColumns(10);
 		
@@ -162,7 +171,6 @@ public class YtFrame extends JFrame {
 		
 		txtpnTxptraduccion = new JTextPane();
 		txtpnTxptraduccion.setDisabledTextColor(Color.BLACK);
-		//txtpnTxptraduccion.setEditable(false);
 		panelTraduccion.add(txtpnTxptraduccion);
 		
 		JPanel panelCentral = new JPanel();
@@ -173,10 +181,11 @@ public class YtFrame extends JFrame {
 		panelCentral.add(panelChat);
 		panelChat.setLayout(new CardLayout(0, 0));
 		
-		listLiveChat = new JList();
+		listLiveChat = new JList<String>(modeloLista);
 		panelChat.add(listLiveChat, "name_40278394319370");
 		listLiveChat.setModel(modeloLista);
-		listLiveChat.setCellRenderer(new RenderList());
+		//////////////////////////////RENDER LIST///////////////////////
+		listLiveChat.setCellRenderer(new RenderList2());
 		
 		JScrollPane scrollJlistC = new JScrollPane(listLiveChat);
 		panelChat.add(scrollJlistC, "name_38499319947502");	
@@ -203,6 +212,7 @@ public class YtFrame extends JFrame {
 					 habilitar(false);
 					 estadoHilo=true;
 					 modeloLista.removeAllElements();
+					 //modeloLista;
 					 Runnable ytc = new YoutubeChat(txtLink.getText().replace("https://www.youtube.com/watch?v=", ""));
 					 ytcT = new Thread(ytc);
 					 ytcT.start();
@@ -254,6 +264,10 @@ public class YtFrame extends JFrame {
 		//System.out.println(listLiveChat.getLastVisibleIndex()+" "+lastIndex);
 		return autoScroll;
 	}
+	 /*public void addNewListItem(URL imageUrl, String text) {
+	        modeloLista.addElement(text + ", " + imageUrl.toString());
+	        listLiveChat.setModel(modeloLista);
+	    }*/
 	
 }
 

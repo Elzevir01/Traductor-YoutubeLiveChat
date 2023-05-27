@@ -18,6 +18,8 @@ public class YoutubeChat implements Runnable{
 	YtFrame ytf;
 	public String link;
 	Aws aws ;
+	public String miembro;
+	public String imagenUrl;
 	
 	public String getLink() {
 		return link;
@@ -51,13 +53,37 @@ public class YoutubeChat implements Runnable{
 		    chat.update();
 		    
 		    for (ChatItem item : chat.getChatItems()) {
-		    	if(!ytf.modeloLista.contains(item.getAuthorName()+": "+item.getMessage())) {
-			    	 mensaje = item.getMessage();
-			         ytf.modeloLista.addElement(item.getAuthorName()+": "+item.getMessage());
+		    	//if(!ytf.modeloLista.contains(item.getAuthorName()+": "+item.getMessage())) {
+		    		//item.isAuthorModerator();
+		    		//item.getMemberBadgeIconURL();
+		    		//item.getPurchaseAmount()
+		    		//item.getAuthorType()
+		    		//item.getType();
+			    	 //mensaje = item.getMessage();
+		    		//[NORMAL, MODERATOR]
+		    	
+	    			tipoMiembro(item.getAuthorType().toString());
+	    			setImage(item.getAuthorIconURL());
+	    			
+			    	mensaje = miembro+item.getAuthorName()+": "+item.getMessage();
+		    		//System.out.println(item.getAuthorType());
+			    	//System.out.println(imagenUrl+" ::: "+mensaje);
+			        //String[] items = {imagenUrl+" "+mensaje};
+
+			    	 //ytf.modeloLista.addElement(miembro+item.getAuthorName()+": "+item.getMessage());
+			    	//ytf.addNewListItem(imagenUrl, mensaje);
+			    	
+			    		///////////ELIMINA EXEDENTE DE 20
+					/*if (ytf.modeloLista.getSize() >= 50) {
+						ytf.modeloLista.remove(0);
+					}*/
+			        ytf.modeloLista.addElement(imagenUrl+":::"+mensaje);///+" ::: "+mensaje
+			        
 		    	}
-		    }
+		    
 		    liveStatusCheckCycle++;
-		    if(liveStatusCheckCycle >= 10) {
+		    if(liveStatusCheckCycle ==100) {//10 //liveStatusCheckCycle >= 10
+		    	//System.out.println(liveStatusCheckCycle);
 		        // Calling this method frequently, cpu usage and network usage become higher because this method requests a http request.
 		        if(!chat.getBroadcastInfo().isLiveNow) {//.isLiveEnd
 		            break;
@@ -88,11 +114,19 @@ public void getTranslatedChatList() {
 		    chat.update();
 		    for (ChatItem item : chat.getChatItems()) {
 		    	mensaje = item.getMessage();
-		        ytf.modeloLista.addElement(item.getAuthorName()+": "+aws.traducirTodo(mensaje));
+		    	
+		    	tipoMiembro(item.getAuthorType().toString());
+    			setImage(item.getAuthorIconURL());
+		    	try {
+		    		
+		        ytf.modeloLista.addElement(imagenUrl+":::"+miembro+item.getAuthorName()+": "+aws.traducirTodo(mensaje));
+		    	}catch(Exception e) {
+		    		System.out.println(e);
+		    	}
 		        
 		    }
 		    liveStatusCheckCycle++;
-		    if(liveStatusCheckCycle >= 10) {
+		    if(liveStatusCheckCycle >= 100) {
 		        // Calling this method frequently, cpu usage and network usage become higher because this method requests a http request.
 		        if(!chat.getBroadcastInfo().isLiveNow) {//.isLiveEnd
 		            break;
@@ -105,8 +139,25 @@ public void getTranslatedChatList() {
 		}
 		    
 		}
-	
-	
+	public String tipoMiembro(String tipo) {
+		
+		if(tipo.toString().contains("MEMBER")){
+			miembro = "[M]";
+		}
+		else if(tipo.toString().contains("MODERATOR")){
+			miembro = "[MOD]";
+		}else {
+			miembro = "[N]";
+		}
+		return miembro;
+		}
+	public void setImage(String imageAutor) {
+		if(imageAutor != null) {
+			imagenUrl = imageAutor;
+		}else {
+			imagenUrl = "https://yt4.ggpht.com/yR98qzW2WEGLSfsNqFU5b0nsDYS2DivE4cGTDS0hJLm1cMp5NSzLFgrm4GefsTXNIAPc2Zu_ag=s64-c-k-c0x00ffffff-no-rj";
+		}
+	}
 	
 }
 
